@@ -1,7 +1,5 @@
-#include <bits/stdc++.h>
+#include <vector>
 using namespace std;
-
-/* Segment Tree (sum) */
 
 class segtree {
 private:
@@ -57,12 +55,3 @@ public:
         return sum(l, r, 0, 0, size);
     }
 };
-
-
-
-
-int main() {
-
-
-    return 0;
-}
