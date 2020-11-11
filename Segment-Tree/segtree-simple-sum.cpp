@@ -43,11 +43,6 @@ public:
     segtree(int n = 0) {
         init(n);
     }
-    template<class T> segtree(vector<T> a) {
-        init(a.size());
-        for (int i = 0; i < a.size(); i++)
-            set(i, a[i]);
-    }
 
     void set(int i, long long v) {
         set(i, v, 0, 0, size);
