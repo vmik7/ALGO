@@ -74,7 +74,7 @@ private:
             return false;
         }
     }
-    void fft(vector<complex<double> > & a, bool invert) const {
+    void fft(vector<complex<long double> > & a, bool invert) const {
         int n = (int)a.size();
         for (int i = 1, j = 0; i < n; i++) {
             int bit = n >> 1;
@@ -89,12 +89,12 @@ private:
                 swap(a[i], a[j]);
         }
         for (int len = 2; len <= n; len <<= 1) {
-            double ang = 2 * acos(-1) /len * (invert ? -1 : 1);
-            complex<double> wlen(cos(ang), sin(ang));
+            long double ang = 2 * acos(-1) /len * (invert ? -1 : 1);
+            complex<long double> wlen(cos(ang), sin(ang));
             for (int i = 0; i < n; i += len) {
-                complex<double> w(1);
+                complex<long double> w(1);
                 for (int j = 0; j < len / 2; j++) {
-                    complex<double> u = a[i + j],  v = a[i + j + len / 2] * w;
+                    complex<long double> u = a[i + j],  v = a[i + j + len / 2] * w;
                     a[i + j] = u + v;
                     a[i + j + len / 2] = u - v;
                     w *= wlen;
@@ -125,7 +125,7 @@ private:
         return del_zeros(a);
     }
     vector<int> mul(const vector<int> & a, const vector<int> & b) const {
-        vector<complex<double> > fa, fb;
+        vector<complex<long double> > fa, fb;
         for (auto i : a) fa.pb(i);
         for (auto i : b) fb.pb(i);
 
