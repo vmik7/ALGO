@@ -144,6 +144,39 @@ private:
             return false;
         }
     }
+    void fft(vector<complex<double> > & a, bool invert) const {
+        int n = (int)a.size();
+        for (int i = 1, j = 0; i < n; i++) {
+            int bit = n >> 1;
+
+            while (j >= bit) {
+                j -= bit;
+                bit >>= 1;
+            }
+            j += bit;
+
+            if (i < j)
+                swap(a[i], a[j]);
+        }
+        for (int len = 2; len <= n; len <<= 1) {
+            double ang = 2 * acos(-1) /len * (invert ? -1 : 1);
+            complex<double> wlen(cos(ang), sin(ang));
+            for (int i = 0; i < n; i += len) {
+                complex<double> w(1);
+                for (int j = 0; j < len / 2; j++) {
+                    complex<double> u = a[i + j],  v = a[i + j + len / 2] * w;
+                    a[i + j] = u + v;
+                    a[i + j + len / 2] = u - v;
+                    w *= wlen;
+                }
+            }
+        }
+        if (invert) {
+            for (int i = 0; i < n; i++)
+                a[i] /= n;
+        }
+        return;
+    }
     vector<int> add(vector<int> a, vector<int> b) const {
         int n = max(a.size(), b.size());
         a.resize(n), b.resize(n);
@@ -246,7 +279,7 @@ public:
     }
 
     void print(ostream& os = cout) const {
-        if (a.empty() || (int)a.size() == 1 && a[0] == 0) {
+        if (is_zero(a)) {
             os << 0;
             return;
         }
