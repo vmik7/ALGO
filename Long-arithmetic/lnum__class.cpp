@@ -1,29 +1,13 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <bits/stdc++.h>
-
-#define all(v) v.begin(), v.end()
-#define rall(v) v.rbegin(), v.rend()
-#define sp(n) fixed << setprecision(n)
-#define _  << " " <<
-#define pb push_back
-#define eb emplace_back
-#define ff first
-#define ss second
-
-using namespace std;
-using ll = long long;
-using ull = unsigned long long;
-using ld = long double;
-using pii = pair<int, int>;
-using pll = pair<ll, ll>;
-
 class lnum {
 private:
-    const int Base = 1000 * 1000 * 10;
+    const int Base = 10000000;
     const int Signs_in_base = 7;
     vector<int> a;
     bool negative = false;
 
+    bool is_zero(const vector<int>& num) const {
+        return (num.size() == 1 && num[0] == 0);
+    }
     vector<int>& del_zeros(vector<int>& num) const {
         while (num.size() > 1 && num.back() == 0)
             num.pop_back();
@@ -42,7 +26,7 @@ private:
         }
         return num;
     }
-    vector<int> trans(ll num) const {
+    vector<int> trans(long long num) const {
         vector<int> res;
         if (num == 0) {
             res.pb(0);
@@ -75,7 +59,6 @@ private:
         negative = false;
         return;
     }
-
     bool is_less(const vector<int>& a, const vector<int>& b) const {
         if (a.size() > b.size()) {
             return false;
@@ -90,24 +73,6 @@ private:
             }
             return false;
         }
-    }
-
-    vector<int> add(vector<int> a, vector<int> b) const {
-        int n = max(a.size(), b.size());
-        a.resize(n), b.resize(n);
-        vector<int> res(n);
-        for (int i = 0; i < n; i++)
-            res[i] = a[i] + b[i];
-        return carry(res);
-    }
-    vector<int> sub(vector<int> a, vector<int> b) const {
-        int c = 0, n = (int)a.size();
-        for (int i = 0; i < n; i++) {
-            a[i] -= c + (i < (int)b.size() ? b[i] : 0);
-            c = (a[i] < 0);
-            if (c) a[i] += Base;
-        }
-        return del_zeros(a);
     }
     void fft(vector<complex<double> > & a, bool invert) const {
         int n = (int)a.size();
@@ -142,7 +107,23 @@ private:
         }
         return;
     }
-
+    vector<int> add(vector<int> a, vector<int> b) const {
+        int n = max(a.size(), b.size());
+        a.resize(n), b.resize(n);
+        vector<int> res(n);
+        for (int i = 0; i < n; i++)
+            res[i] = a[i] + b[i];
+        return carry(res);
+    }
+    vector<int> sub(vector<int> a, vector<int> b) const {
+        int c = 0, n = (int)a.size();
+        for (int i = 0; i < n; i++) {
+            a[i] -= c + (i < (int)b.size() ? b[i] : 0);
+            c = (a[i] < 0);
+            if (c) a[i] += Base;
+        }
+        return del_zeros(a);
+    }
     vector<int> mul(const vector<int> & a, const vector<int> & b) const {
         vector<complex<double> > fa, fb;
         for (auto i : a) fa.pb(i);
@@ -159,11 +140,11 @@ private:
             fa[i] *= fb[i];
         fft(fa, true);
 
-        vector<ll> num(n);
+        vector<long long> num(n);
         for (int i = 0; i < n; i++)
-            num[i] = (ll)(fa[i].real() + 0.5);
+            num[i] = (long long)(fa[i].real() + 0.5);
 
-        ll c = 0;
+        long long c = 0;
         for (int i = 0; i < n; i++) {
             num[i] += c;
             c = num[i] / Base;
@@ -180,10 +161,20 @@ private:
 
         return del_zeros(res);
     }
+    vector<int> div(vector<int> a, long long b, long long& rem) const {
+        long long c = 0;
+        for (int i = (int)a.size() - 1; i >= 0; i--) {
+            long long cur = a[i] + c * Base;
+            a[i] = (int)(cur / b);
+            c = (int)(cur % b);
+        }
+        rem = c;
+        return del_zeros(a);
+    }
 
 public:
     lnum() { set_default(); }
-    lnum(ll num) {
+    lnum(long long num) {
         a = trans(num);
         negative = (num < 0);
     }
@@ -206,6 +197,8 @@ public:
         if (s[0] == '-') {
             a = trans(s.substr(1));
             negative = true;
+            if (a.size() == 1 && a[0] == 0)
+                negative = false;
         }
         else {
             a = trans(s);
@@ -230,16 +223,13 @@ public:
             cout << setw(Signs_in_base) << setfill('0') << a[i];
         return;
     }
-
     lnum& operator = (const lnum& t) {
         this->a = t.a;
         this->negative = t.negative;
         return *this;
     }
-
     friend ostream& operator << (ostream& os, const lnum& a);
     friend istream& operator >> (istream& is, lnum& num);
-
     bool operator == (const lnum& t) const {
         return (this->a == t.a && this->negative == t.negative);
     }
@@ -284,15 +274,61 @@ public:
             }
         }
     }
+    lnum operator += (const lnum& t) {
+        return *this = *this + t;
+    }
     lnum operator - (const lnum& t) const {
         return (*this + (-t));
     }
+    lnum operator -= (const lnum& t) {
+        return *this = *this - t;
+    }
+    lnum operator ++ () {
+        return *this = *this + 1;
+    }
+    lnum operator -- () {
+        return *this = *this - 1;
+    }
+    lnum operator ++ (int) {
+        lnum backup = *this;
+        *this = *this + 1;
+        return backup;
+    }
+    lnum operator -- (int) {
+        lnum backup = *this;
+        *this = *this - 1;
+        return backup;
+    }
     lnum operator * (const lnum& t) const {
         lnum res(mul(this->a, t.a), ((this->negative) ^ (t.negative)));
-        if (res == lnum(0))
+        if (is_zero(res.a))
             res.negative = false;
         return res;
     }
+    lnum operator *= (const lnum& t) {
+        return *this = *this * t;
+    }
+    lnum operator / (const long long b) const {
+        assert(b && abs(b) < Base);
+        long long rem;
+        lnum res(div(this->a, abs(b), rem), ((this->negative) ^ (b < 0)));
+        if (is_zero(res.a))
+            res.negative = false;
+        return res;
+    }
+    lnum operator /= (const long long b) {
+        return *this = *this / b;
+    }
+    long long operator % (const long long b) const {
+        assert(b && abs(b) < Base);
+        long long rem;
+        div(this->a, abs(b), rem);
+        return rem;
+    }
+    lnum operator %= (const long long b) {
+        return *this = *this % b;
+    }
+    friend lnum abs(lnum t);
 };
 istream& operator >> (istream& is, lnum& num) {
     string s;
@@ -304,40 +340,7 @@ ostream& operator << (ostream& os, const lnum& a) {
     a.print(os);
     return os;
 }
-
-int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    cout << sp(10);
-
-#ifdef LOCAL_DEBUG
-    freopen("input.txt", "r", stdin);
-//    freopen("output.txt", "w", stdout);
-#endif
-
-    lnum a, b;
-    cin >> a >> b;
-
-    if (a == b) cout << a << " == " << b << endl;
-    if (a != b) cout << a << " != " << b << endl;
-    if (a < b) cout << a << " < " << b << endl;
-    if (a <= b) cout << a << " <= " << b << endl;
-    if (a > b) cout << a << " > " << b << endl;
-    if (a >= b) cout << a << " >= " << b << endl;
-
-    cout << "-(" << a << ") = " << -a << endl;
-    cout << "-(" << a << ") = " << -b << endl;
-
-    cout << "(" << b << ") + (" << a << ") = "<< b + a << endl;
-    cout << "(" << a << ") + (" << b << ") = "<< a + b << endl;
-    cout << "(" << a << ") - (" << b << ") = "<< a - b << endl;
-    cout << "(" << b << ") - (" << a << ") = "<< b - a << endl;
-
-    cout << "(" << b << ") * (" << a << ") = "<< b * a << endl;
-
-#ifdef LOCAL_DEBUG
-    cerr << "Execution time: " << 1.0 * clock() / CLOCKS_PER_SEC << "s.\n";
-#endif
-
-    return 0;
+lnum abs(lnum t) {
+    t.negative = false;
+    return t;
 }
