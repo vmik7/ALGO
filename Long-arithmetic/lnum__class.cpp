@@ -67,7 +67,7 @@ private:
             return true;
         }
         else {
-            for (int i = 0; i < (int)a.size(); i++) {
+            for (int i = (int)a.size() - 1; i >= 0; i--) {
                 if (a[i] < b[i]) return true;
                 if (a[i] > b[i]) return false;
             }
@@ -329,6 +329,8 @@ public:
         return *this = *this % b;
     }
     friend lnum abs(lnum t);
+    friend lnum min(const lnum& x, const lnum& y);
+    friend lnum max(const lnum& x, const lnum& y);
 };
 istream& operator >> (istream& is, lnum& num) {
     string s;
@@ -343,4 +345,10 @@ ostream& operator << (ostream& os, const lnum& a) {
 lnum abs(lnum t) {
     t.negative = false;
     return t;
+}
+lnum min(const lnum& x, const lnum& y) {
+    return (x < y ? x : y);
+}
+lnum max(const lnum& x, const lnum& y) {
+    return (x > y ? x : y);
 }
