@@ -15,7 +15,7 @@ bool is_equal(ld a, ld b) {
     return b - EPS < a && a < b + EPS;
 }
 
-const ll MOD = INT_MAX;
+const ll MOD = 1000000007;
 ll add(ll a, ll b, ll m = MOD) {
     return (a + b) % m;
 }
@@ -41,6 +41,29 @@ ll div(ll a, ll b, ll m = MOD) {
     return mul(a, rev(b, m), m);
 }
 
+ll C(ll n, ll k, ll m = MOD) {
+    if (n < k) return 0;
+    k = min(k, n - k);
+    ll res = 1;
+    for (ll i = 1; i <= k; i++)
+        res = div(mul(res, add(n - k, i, m), m), i, m);
+    return res % m;
+}
+
+//ll C(ll n, ll k, ll m = MOD) {
+//    if (k > n) return 0;
+//    return div(f[n], mul(f[k], f[n - k], m), m);
+//}
+
+//ll C(ll n, ll k) {
+//    if (n < k) return 0;
+//    k = min(k, n - k);
+//    ll res = 1;
+//    for (ll i = 1; i <= k; i++)
+//        res = res * (n - k + i) / i;
+//    return res;
+//}
+
 ll euler(ll n, ll m = MOD) {
     ll res = n % m;
     for (ll i = 2; i * i <= n; i++)
@@ -52,14 +75,6 @@ ll euler(ll n, ll m = MOD) {
     if (n > 1)
         res = sub(res, div(res, n, m), m);
     return res;
-}
-
-ll C(ll n, ll k, ll m = MOD) {
-    k = min(k, n - k);
-    ll res = 1;
-    for (ll i = 1; i <= k; i++)
-        res = div(mul(res, add(n - k, i, m), m), i, m);
-    return res % m;
 }
 
 //ll euler(ll n) {
@@ -75,10 +90,4 @@ ll C(ll n, ll k, ll m = MOD) {
 //    return res;
 //}
 
-//ll C(ll n, ll k) {
-//    k = min(k, n - k);
-//    ll res = 1;
-//    for (ll i = 1; i <= k; i++)
-//        res = res * (n - k + i) / i;
-//    return res;
-//}
+
